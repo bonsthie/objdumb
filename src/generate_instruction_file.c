@@ -3,7 +3,7 @@
 
 int generate_instruction_file(t_instruction *instructions)
 {
-	 FILE *file = fopen("instruction_tmp.h", "w");
+	 FILE *file = fopen("include/instruction_tmp.h", "w");
 
     if (!file) {
         perror("Error opening file");

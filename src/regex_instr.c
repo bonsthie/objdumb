@@ -6,7 +6,7 @@
 //   By: rgramati <rgramati@student.42angouleme.fr  +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2024/10/07 14:43:19 by rgramati          #+#    #+#             //
-//   Updated: 2024/10/07 19:26:01 by rgramati         ###   ########.fr       //
+//   Updated: 2024/10/07 20:17:07 by rgramati         ###   ########.fr       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -31,26 +31,57 @@
 	" *<td>"CAPTURE_INV("<")"</td>\n"\
 	" *<td>"CAPTURE_INV("<")"</td>"
 
+void	instr_push(t_instruction **list, t_instruction *new)
+{
+	if (!list || !new)
+		return ;
+	if (!*list)
+	{
+		*list = new;
+		return ;
+	}
+	t_instruction	*tmp = *list;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new;
+}
+
+t_instruction	*new_instr(char *name, char *instr, char *desc)
+{
+	t_instruction	*new;
+
+	new = malloc(sizeof(t_instruction));
+	if (new)
+	{
+		new->name = name;
+		new->instr = instr;
+		new->desc = desc;
+		new->next = NULL;
+	}
+	return (new);
+}
+
+char	*strjoin(char const *s1, char const *s2);
+
 int	next_instruction(regex_t *reg, char *str, char **remain, t_instruction **list)
 {
-	uint32_t	i;
 	uint32_t	err;
 	regmatch_t	matches[7];
 
-	(void) list;
-	i = 0;
-	err = regexec(reg, str, 7, &matches[0], 0);
+	err = regexec(reg, str, 7, matches, 0);
 	if (err)
 		return (1);
 	else
 	{
-		for (int j = 0; j < 6; j++)
-		{
-			int len = matches[i].rm_eo - matches[i].rm_so;
-			printf("group %d : [%*.*s]\n", i, len, len, str + matches[i].rm_so);
-			i++;
-		}
-		*remain = str + matches[i - 1].rm_eo;
+		str[matches[1].rm_eo] = 0;
+		str[matches[2].rm_eo] = 0;
+		str[matches[3].rm_eo] = 0;
+		str[matches[5].rm_eo] = 0;
+
+		t_instruction	*new = new_instr(strjoin(str + matches[1].rm_so, str + matches[2].rm_so), str + matches[3].rm_so, str + matches[5].rm_so);
+
+		instr_push(list, new);
+		*remain = str + matches[5].rm_eo + 1;
 	}
 	return (0);
 }
@@ -68,5 +99,13 @@ t_instruction	*parse_instructions(char *file)
 		exit(1);
 	}
 	while (!next_instruction(&reg, file, &file, &instr));
-	return (0);
+
+	t_instruction	*tmp = instr;
+	while (tmp)
+	{
+		printf("INSTRUCTION (\n  name: [%s],\n instr: [%s],\n  desc: [%s]\n)", tmp->name, tmp->instr, tmp->desc);
+		tmp = tmp->next;
+	}
+
+	return (instr);
 }

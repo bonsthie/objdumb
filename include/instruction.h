@@ -21,6 +21,7 @@ extern char	*instruction_definition[];
 enum e_instruction
 {
 #include "instruction_tmp.h"
+	INSTR_END,
 };
 
 #undef INSTRUCTION_INPUT
