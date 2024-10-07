@@ -1,6 +1,14 @@
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 
+typedef struct	s_instruction
+{
+	char					*name;
+	char					*instr;
+	char					*desc;
+	struct s_instruction	*next;
+}	t_instruction;
+
 #define INSTRUCTION_INPUT(enum_value, value, definition) enum_value,
 
 enum e_instruction

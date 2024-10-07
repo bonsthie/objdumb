@@ -65,7 +65,11 @@ char    *get_temp_file(char *head, int size)
 char *map_file_to_buffer(const char *file)
 {
 	int tmp_file_fd = open(file, O_RDWR);
-	char *result = mmap(NULL, get_file_size(tmp_file_fd), PROT_READ | PROT_WRITE, MAP_PRIVATE, tmp_file_fd, 0);
+
+	char *result = mmap(NULL, get_file_size(tmp_file_fd),
+					 PROT_READ | PROT_WRITE, MAP_PRIVATE,
+					 tmp_file_fd, 0);
+
 	close (tmp_file_fd);
 	return (result);
 }
