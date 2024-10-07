@@ -6,7 +6,7 @@
 //   By: rgramati <rgramati@student.42angouleme.fr  +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2024/10/07 14:43:19 by rgramati          #+#    #+#             //
-//   Updated: 2024/10/07 16:13:35 by rgramati         ###   ########.fr       //
+//   Updated: 2024/10/07 19:26:01 by rgramati         ###   ########.fr       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -15,25 +15,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// #include <objdumb.h>
+#include <instruction.h>
+
+#define CAPTURE(X)		"("X")"
+
+#define MATCH_ALNUM		"[A-Za-z0-9]"
+
+#define ZERO_OR_MORE(X)	X"*"
+
+#define CAPTURE_INV(X)	CAPTURE(ZERO_OR_MORE("[^"X"]"))
 
 #define OBJDUMB_SCRAP_PATTERN \
-"<tr>\n *<td><a href=\"[A-Za-z0-9 -/:<>.]*\">([A-Za-z0-9 ]*)</a> (.*?)</td>\n *<td>(.*?)</td>\n *<td>(.*?)</td>\n *<td>(.*?)</td>\n *</tr>"
+	"<tr>\n *<td><a href=\"\\./"ZERO_OR_MORE(MATCH_ALNUM)"\\.html\">"CAPTURE_INV("<")"</a> "CAPTURE_INV("<")"</td>\n"\
+	" *<td>"CAPTURE_INV("<")"</td>\n"\
+	" *<td>"CAPTURE_INV("<")"</td>\n"\
+	" *<td>"CAPTURE_INV("<")"</td>"
 
-int	next_instruction(regex_t *reg, char *str, char **remain)
+int	next_instruction(regex_t *reg, char *str, char **remain, t_instruction **list)
 {
 	uint32_t	i;
 	uint32_t	err;
 	regmatch_t	matches[7];
 
+	(void) list;
 	i = 0;
 	err = regexec(reg, str, 7, &matches[0], 0);
 	if (err)
 		return (1);
 	else
 	{
-		printf("Match :\n");
-		while (matches[i].rm_so != -1)
+		for (int j = 0; j < 6; j++)
 		{
 			int len = matches[i].rm_eo - matches[i].rm_so;
 			printf("group %d : [%*.*s]\n", i, len, len, str + matches[i].rm_so);
@@ -44,10 +55,11 @@ int	next_instruction(regex_t *reg, char *str, char **remain)
 	return (0);
 }
 
-uint32_t	parse_instructions(char *file)
+t_instruction	*parse_instructions(char *file)
 {
-	regex_t		reg = {0};
-	uint32_t	err;
+	regex_t			reg = {0};
+	t_instruction	*instr = NULL;
+	uint32_t		err;
 
 	err = regcomp(&reg, OBJDUMB_SCRAP_PATTERN, REG_EXTENDED);
 	if (err)
@@ -55,9 +67,6 @@ uint32_t	parse_instructions(char *file)
 		printf("Regex pattern compilation failed.\n");
 		exit(1);
 	}
-
-	while (!next_instruction(&reg, file, &file));
-
+	while (!next_instruction(&reg, file, &file, &instr));
 	return (0);
 }
-
