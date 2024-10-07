@@ -1,7 +1,7 @@
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 
-#define INSTRUCTION_INPUT(enum_value, value) enum_value,
+#define INSTRUCTION_INPUT(enum_value, value, definition) enum_value,
 
 enum e_instruction
 {
@@ -10,9 +10,17 @@ enum e_instruction
 
 #undef INSTRUCTION_INPUT
 
-#define INSTRUCTION_INPUT(enum_value, value) [enum_value] = value,
+#define INSTRUCTION_INPUT(enum_value, value, definition) [enum_value] = value,
 
+/* ODR crampte */
 char *instruction_table[] = {
+#include "instruction_tmp.h"
+};
+
+#undef INSTRUCTION_INPUT
+
+#define INSTRUCTION_INPUT(enum_value, value, definition) [enum_value] = definition,
+char *instruction_definition[] = {
 #include "instruction_tmp.h"
 };
 

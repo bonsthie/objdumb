@@ -82,7 +82,7 @@ char *scrap_url(const char *page)
 		NULL,
 	};
 
-	tmp_file = get_temp_file("/tmp/", 10);
+	tmp_file = get_temp_file("/tmp/", 249);
 	if (!tmp_file)
 		return (NULL);
 	int pid = fork();
